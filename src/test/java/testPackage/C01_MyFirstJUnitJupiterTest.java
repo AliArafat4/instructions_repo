@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class MyFirstJUnitJupiterTest {
+public class C01_MyFirstJUnitJupiterTest {
     WebDriver driver;
     @Test
     public void myPssingTest()  {
@@ -23,6 +23,14 @@ public class MyFirstJUnitJupiterTest {
         String actualTitle = driver.getTitle();
         System.out.println("Title: " + actualTitle);
         Assertions.assertEquals("GoogleX", actualTitle, "Title does not match!");
+    }
+
+    @Test
+    void checkPageURLContainsAmazon(){
+        driver.get("https://www.amazon.com");
+        String currentURL = driver.getCurrentUrl();
+        System.out.println("Current URL: " + currentURL);
+        Assertions.assertTrue(currentURL.toLowerCase().contains("amazon".toLowerCase()));
     }
 
     @BeforeEach
