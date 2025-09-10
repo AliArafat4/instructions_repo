@@ -5,8 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -24,48 +29,59 @@ Selenium provides three types of waits:
 
     Using waits properly makes tests more stable and reliable.
  */
-public class C013HardWaitAndImplicitWait {
+public class C14ExplicitWaitAndFluentWait {
     WebDriver driver;
     String url = "https://webdriveruniversity.com/Popup-Alerts/index.html";
-
     By clickMeLinkByXpath = By.xpath("//a[.='CLICK ME!']");
     By clickMeButton = By.id("button1");
     By wellDoneTextByTagName = By.tagName("h4");
-
     @Test
-    void hardWaitTest() throws InterruptedException {
-        // Time-based synchronization - Static wait
-        // Static wait represents waiting for a fixed amount of time
-        // The execution continues only after the specified time has passed
-        // In Selenium with Java, we use the Thread.sleep() method to implement static waits
-        // It is not recommended for dynamic web applications, as it may cause unnecessary delays or failures
+    void expliciteWaitTest()  {
+/*
+    Specifies the condition and the time that WebDriver should wait.
+    In practice, WebDriverWait and Explicit Wait are synonymous,
+    since their definitions and usage perfectly match.
 
+    // How to use Explicit Wait
+    // 1- Create a WebDriverWait object
+    // 2- Pass the desired condition to the 'until' method of the wait object
+*/
+
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
 
         //    Go to https://webdriveruniversity.com/Popup-Alerts/index.html
         driver.get(url);
         //    Click on Ajax Loader
-        Thread.sleep(1000);
         driver.findElement(clickMeLinkByXpath).click();
         //    Click on 'Click Me'
-        Thread.sleep(8000);
         driver.findElement(clickMeButton).click();
-
         //    Assert text "Well Done For Waiting....!!!"
-        Thread.sleep(2000);
+
+        // First Way : Using "ExpectedConditions"
+        //wait.until(ExpectedConditions.visibilityOfElementLocated(wellDoneTextByTagName));
+        //Assertions.assertTrue(driver.findElement(wellDoneTextByTagName).getText().contains("Well Done For Waiting"));
+
+        // Second Way: Write your own wait strategy
+        wait.until(t-> t.findElement(wellDoneTextByTagName).isDisplayed());
         Assertions.assertTrue(driver.findElement(wellDoneTextByTagName).getText().contains("Well Done For Waiting"));
+
+
 
     }
-
     @Test
-    void implicitWaitTest() throws InterruptedException {
+    void fluemtWaitTest() throws InterruptedException {
 /*
-    Implicit wait assigns a default waiting time for all elements on the page.
-    However, once the element is found, it stops waiting immediately.
-    This applies to all elements on the page and waits until the specified time for an element to be located.
-    In other words, it waits for the given duration to avoid NoSuchElementException.
-    Implicit wait is global, meaning the same wait time is applied to all web elements.
+   Fluent Wait is a type of Explicit Wait that allows you to define:
+   - The maximum time to wait for a condition
+   - The polling period (how often to check the condition)
+   - Ignored exceptions while waiting (e.g., NoSuchElementException)
+   It provides more flexibility than Implicit and Explicit Wait.
 */
-driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // Sets a global wait for all elements (no need to set again for each one)
+
+        Wait<WebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(13))
+                        .pollingEvery(Duration.ofMillis(500))
+                                .ignoring(NotFoundException.class);
 
         //    Go to https://webdriveruniversity.com/Popup-Alerts/index.html
         driver.get(url);
@@ -74,13 +90,20 @@ driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // Sets a glo
         //    Click on 'Click Me'
         driver.findElement(clickMeButton).click();
         //    Assert text "Well Done For Waiting....!!!"
-        Thread.sleep(2000);
+
+        // First Way : Using "ExpectedConditions"
+        wait.until(ExpectedConditions.visibilityOfElementLocated(wellDoneTextByTagName));
         Assertions.assertTrue(driver.findElement(wellDoneTextByTagName).getText().contains("Well Done For Waiting"));
+
+        // Second Way: Write your own wait strategy
+        //wait.until(t-> t.findElement(wellDoneTextByTagName).isDisplayed());
+        //Assertions.assertTrue(driver.findElement(wellDoneTextByTagName).getText().contains("Well Done For Waiting"));
 
     }
     @BeforeEach
     void setUp() {
         driver= new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
 
