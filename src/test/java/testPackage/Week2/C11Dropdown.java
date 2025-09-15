@@ -1,4 +1,4 @@
-package testPackage;
+package testPackage.Week2;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;

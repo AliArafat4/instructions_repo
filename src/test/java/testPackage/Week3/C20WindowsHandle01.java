@@ -1,4 +1,4 @@
-package testPackage;
+package testPackage.Week3;
 
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WindowType;
